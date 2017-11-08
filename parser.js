@@ -7,11 +7,11 @@ const fs = require('fs'),
 	};
 
 function checkValue(param) {
-	return param ===''?' IS NULL':('=\''+param+'\'');
+	return param === '' ? ('=\'' + param + '\'') : ('=\'' + param + '\'');
 }
 
-function checkEmpty(param){
-	return param ===''? 'NULL':('\''+param+'\'');
+function checkEmpty(param) {
+	return param === '' ? ('\'' + param + '\'') : ('\'' + param + '\'');
 }
 
 function sec_id(row) {
@@ -25,7 +25,7 @@ function atd_id(row) {
 
 function oco_id(row) {
 	return 'oco_id AS (SELECT oco.codigo FROM public.ocorrencia AS oco WHERE oco.data' + checkValue(row.OCORRENCIA_DATA) + ' AND oco.dia_semana' + checkValue(row.OCORRENCIA_DIA_SEMANA) + ' AND oco.operacao_descricao' + checkValue(row.OPERACAO_DESCRICAO) + ' AND oco.hora' + checkValue(row.OCORRENCIA_HORA) +
-		' AND oco.logradouro' + checkValue(row.LOGRADOURO_NOME) + ' AND oco.bairro' + checkValue(row.ATENDIMENTO_BAIRRO_NOME) + ' AND oco.nome_equipamento' +checkValue(row.EQUIPAMENTO_URBANO_NOME) + ' AND oco.flagrante = \'' + (row.FLAG_FLAGRANTE == 'SIM' ? true : false) + '\' AND oco.id_atendimento = (SELECT id_atendimento FROM atd_id))';
+		' AND oco.logradouro' + checkValue(row.LOGRADOURO_NOME) + ' AND oco.bairro' + checkValue(row.ATENDIMENTO_BAIRRO_NOME) + ' AND oco.nome_equipamento' + checkValue(row.EQUIPAMENTO_URBANO_NOME) + ' AND oco.flagrante = \'' + (row.FLAG_FLAGRANTE == 'SIM' ? true : false) + '\' AND oco.id_atendimento = (SELECT id_atendimento FROM atd_id))';
 }
 
 function insertSecretaria(row) {
@@ -54,16 +54,23 @@ function insertCategoria(row) {
 
 function main() {
 	var csvData = [];
+	let count = 0
 	fs.createReadStream("./base_de_dados.csv")
 		.pipe(parse(config))
 		.on('data', function (csvrow) {
 			//do something with csvrow
-			console.log('\n -- ========');
-			console.log(insertSecretaria(csvrow));
-			console.log(insertAtendimento(csvrow));
-			console.log(insertOcorrencia(csvrow));
-			console.log(insertNatureza(csvrow));
-			console.log(insertCategoria(csvrow));
+
+			if (csvrow.ATENDIMENTO_ANO >= 2015){
+				if (count > 80000 && count <= 100000) {
+					console.log('\n -- ========');
+					console.log(insertSecretaria(csvrow));
+					console.log(insertAtendimento(csvrow));
+					console.log(insertOcorrencia(csvrow));
+					console.log(insertNatureza(csvrow));
+					console.log(insertCategoria(csvrow));
+				}
+				count++;
+			}
 		})
 		.on('end', function () {
 			//do something wiht csvData
